@@ -1,4 +1,4 @@
-package org.example.tp.s;
+package org.example.tp.s.tp1;
 /*
 
 Dans ce fichier, vous trouverez une violation du Principe de Responsabilité Unique (Single Responsibility Principle). 
@@ -13,8 +13,10 @@ Objectif : Dans cet exercice, vous allez vous entraîner à appliquer le Princip
 Instructions :
 
 1. **Examinez le code fourni** : Commencez par examiner le code original fourni - la classe `UserDataManager`. Identifiez les parties où le code viole le Principe de Responsabilité Unique en ayant des classes responsables de plusieurs tâches.
+#la classe gère 3 responsabilités et viole donc le principe de responsabilité unique à ces endroits.
 
 2. **Identifiez les responsabilités** : Analysez le code pour identifier les responsabilités ou fonctionnalités distinctes qui peuvent être séparées dans des classes individuelles. Concentrez-vous sur des domaines tels que l'enregistrement d'utilisateurs, la connexion, la manipulation des données, ou toute autre tâche distincte.
+#la classe gère 3 responsabilités : validation des données utilisateur, enregistrement et connexion de l'utilisateur et gestion de la base de données.
 
 3. **Refactorisez le code** : Refactorisez le code pour créer des classes séparées pour chaque responsabilité identifiée (`UserValidator`, `UserRegistration`, `UserAuthenticator`). Assurez-vous que chaque classe a un objectif clair et unique, tel que l'enregistrement d'utilisateur, l'authentification ou la manipulation des données.
 
@@ -30,40 +32,23 @@ Note : Pour l'enregistrement et la connexion, nous n'utiliserons aucun stockage 
 public class UserDataManager {
     private String username;
     private String password;
+    private UserRegistration registration;
+    private UserAuthenticator authenticator;
 
     public UserDataManager(String username, String password) {
         this.username = username;
         this.password = password;
+        UserValidator validator = new UserValidator();
+        this.registration = new UserRegistration(validator);
+        this.authenticator = new UserAuthenticator(validator);
     }
 
     public void registerUser() {
-        // Valider le nom d'utilisateur et le mot de passe
-        if (validateUsername(username) && validatePassword(password)) {
-            // Enregistrer l'utilisateur dans la base de données
-            System.out.println("Utilisateur enregistré avec succès.");
-        } else {
-            System.out.println("Nom d'utilisateur ou mot de passe invalide.");
-        }
+        registration.register(username, password);
     }
 
     public void loginUser() {
-        // Valider le nom d'utilisateur et le mot de passe
-        if (validateUsername(username) && validatePassword(password)) {
-            // Authentifier l'utilisateur
-            System.out.println("Utilisateur connecté avec succès.");
-        } else {
-            System.out.println("Nom d'utilisateur ou mot de passe invalide.");
-        }
-    }
-
-    private boolean validateUsername(String username) {
-        // Valider le nom d'utilisateur (ex: longueur, caractères autorisés)
-        return username.length() >= 5 && username.matches("[a-zA-Z_0-9]+");
-    }
-
-    private boolean validatePassword(String password) {
-        // Valider le mot de passe (ex: longueur, complexité)
-        return password.length() >= 8 && password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$");
+        authenticator.authenticate(username, password);
     }
 
     public static void main(String[] args) {
@@ -72,5 +57,3 @@ public class UserDataManager {
         userManager.loginUser();
     }
 }
-
-
